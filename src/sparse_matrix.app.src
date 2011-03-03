@@ -1,0 +1,12 @@
+{application, sparse_matrix,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { sparse_matrix_app, []}},
+  {env, []}
+ ]}.
