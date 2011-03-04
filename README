@@ -1,0 +1,31 @@
+Description
+This is a library for representing sparse matrices in Erlang using a modified
+triplet representation. On the face of it, Erlang is not the first language of 
+choice for working with matrices. However, the representation is usefully 
+compact for certain cases, such as configuration or bit masks. This is the 
+primary use case for the library, although a rudimentary summation operation
+is defined. Additional mathematical operations may be included later if there
+is interest.
+
+One nice feature of the library is that coordinates are arbitrary. If integer
+indices are used, then the dimensions of the matrix are based on the maximum
+index for each dimension. If the indices are specified by atoms, then the 
+dimensions are determined by the number of populated entries per dimension.
+
+Creating sparse matrices can be accomplished by using the from_triplets
+function which takes a list of triplet tuples and produces a sparse_matrix 
+record.
+
+Examples
+> A = sparse_matrix:from_triplets([
+    {albany,new_york,180}, {new_york,buffalo,360},
+    {new_york,montreal,325}, {boston,new_york,250} ]).
+> sparse_matrix:value({new_york,montreal}, A).
+325
+> sparse_matrix:value({montreal,new_york}, A). 
+0
+
+
+Author
+Brian Lee Yung Rowe
+
