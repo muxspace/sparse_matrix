@@ -1,19 +1,23 @@
 -module(sparse_matrix).
--export([from_triplets/1, from_list/1, from_list/2,
-  add/2, mult/2, value/2, values/2, coordinates/1]).
+-export([from_triplet/1, from_triplet/2,
+  from_list/1, from_list/2, from_list/3,
+  add/2, mult/2, value/2, values/2, 
+  coordinates/1, dimensions/1]).
 -include("include/sparse_matrix.hrl").
 
 
-from_triplets(Triplets) ->
-  from_list([ {{R,C},V} || {R,C,V} <- Triplets ]).
+from_triplet(Triplets) -> from_triplet(Triplets, 0).
+from_triplet(Triplets, Default) ->
+  from_list([ {{R,C},V} || {R,C,V} <- Triplets ], Default).
 
-from_list(List) ->
+from_list(List) -> from_list(List, 0).
+from_list(List, Default) ->
   MaxR = max_rows(List, hd(List)),
   MaxC = max_cols(List, hd(List)),
-  from_list(List, {MaxR,MaxC}).
+  from_list(List, Default, {MaxR,MaxC}).
 
-from_list(List, {MaxR,MaxC}) when is_integer(MaxR), is_integer(MaxC) ->
-  #sparse_matrix{dims={MaxR,MaxC}, values=List}.
+from_list(List, Default, {MaxR,MaxC}) when is_integer(MaxR), is_integer(MaxC) ->
+  #sparse_matrix{dims={MaxR,MaxC}, default=Default, values=List}.
 
 add(A,B) when is_record(A,sparse_matrix), is_record(B,sparse_matrix) ->
   ASet = ordsets:from_list(coordinates(A)),
@@ -64,3 +68,6 @@ max_cols(List, _) ->
  
 coordinates(Matrix) when is_record(Matrix, sparse_matrix) ->
   [ {R,C} || {{R,C}, _} <- Matrix#sparse_matrix.values ].
+
+dimensions(Matrix) when is_record(Matrix, sparse_matrix) ->
+  Matrix#sparse_matrix.dims.
