@@ -1,11 +1,15 @@
 -module(sparse_matrix).
--export([from_triplet/1, from_triplet/2,
+-export([new/0, new/1,
+  from_triplet/1, from_triplet/2,
   from_list/1, from_list/2, from_list/3,
   get/2, put/2, delete/2, coordinates/1, dimensions/1,
   add/2, mult/2 ]).
 -include("sparse_matrix.hrl").
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONSTRUCTORS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+new() -> #sparse_matrix{}.
+new(Default) -> #sparse_matrix{default=Default}.
+
 from_triplet(Triplets) -> from_triplet(Triplets, 0).
 from_triplet(Triplets, Default) ->
   from_list([ {{R,C},V} || {R,C,V} <- Triplets ], Default).

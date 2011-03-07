@@ -1,6 +1,14 @@
 -module(sparse_matrix_tests).
 -include_lib("eunit/include/eunit.hrl").
 
+new_test_() ->
+  Mat = sparse_matrix:new(),
+  ?_assertMatch(0, sparse_matrix:get({2,3}, Mat)).
+
+new_default_test_() ->
+  Mat = sparse_matrix:new(true),
+  ?_assertMatch(true, sparse_matrix:get({2,3}, Mat)).
+
 from_triplet_test_() ->
   Raw = [ {new_york,montreal,8}, {new_york,boston,4}, {new_york,buffalo,9},
     {buffalo,toronto,3}, {boston,montreal,7} ],
