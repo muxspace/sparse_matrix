@@ -3,7 +3,7 @@
   from_list/1, from_list/2, from_list/3,
   get/2, put/2, delete/2, coordinates/1, dimensions/1,
   add/2, mult/2 ]).
--include("include/sparse_matrix.hrl").
+-include("sparse_matrix.hrl").
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONSTRUCTORS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 from_triplet(Triplets) -> from_triplet(Triplets, 0).
