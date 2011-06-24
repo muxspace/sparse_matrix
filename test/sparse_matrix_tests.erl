@@ -25,6 +25,27 @@ from_triplet_default_test_() ->
   ?_assertMatch(4, sparse_matrix:get({new_york,boston}, Mat)),
   ?_assertMatch(-1, sparse_matrix:get({philadelphia,boston}, Mat)).
 
+from_triplet_symmetric_test_() ->
+  Raw = [ {new_york,montreal,8}, {new_york,boston,4}, {new_york,buffalo,9},
+    {buffalo,toronto,3}, {boston,montreal,7} ],
+	Mat = sparse_matrix:from_triplet(Raw, -1, true),
+	?_assertMatch({3,4}, sparse_matrix:dimensions(Mat)),
+	?_assertMatch(4, sparse_matrix:get({boston,new_york}, Mat)),
+	?_assertMatch(8, sparse_matrix:get({montreal,new_york},Mat)),
+  ?_assertMatch(-1, sparse_matrix:get({philadelphia,boston}, Mat)).	
+ 
+from_triplet_symmetric_false_test_() ->
+  Raw = [ {new_york,montreal,8}, {new_york,boston,4}, {new_york,buffalo,9},
+    {buffalo,toronto,3}, {boston,montreal,7} ],
+	Mat = sparse_matrix:from_triplet(Raw, -1, false),
+  ?_assertMatch({3,4}, sparse_matrix:dimensions(Mat)),
+  ?_assertMatch(4, sparse_matrix:get({new_york,boston}, Mat)),
+	?_assertMatch(-1, sparse_matrix:dimensions(Mat)),
+	?_assertMatch(-1, sparse_matrix:get({boston,new_york}, Mat)),
+	?_assertMatch(-1, sparse_matrix:get({montreal,new_york},Mat)),
+  ?_assertMatch(-1, sparse_matrix:get({philadelphia,boston}, Mat)).	
+
+
 integer_index_test_() ->
   Raw = [ {1,1, 5}, {1,2, 3}, {2,1, 4}, {2,6, 3} ],
   Mat = sparse_matrix:from_triplet(Raw),

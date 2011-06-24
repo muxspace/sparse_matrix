@@ -1,6 +1,6 @@
 -module(sparse_matrix).
--export([new/0, new/1,
-  from_triplet/1, from_triplet/2,
+-export([new/0, new/1, new/2,
+  from_triplet/1, from_triplet/2, from_triplet/3,
   from_list/1, from_list/2, from_list/3,
   get/2, put/2, delete/2, coordinates/1, dimensions/1,
   add/2, mult/2 ]).
@@ -9,31 +9,51 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONSTRUCTORS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 new() -> #sparse_matrix{}.
 new(Default) -> #sparse_matrix{default=Default}.
+new(Default,Sym) -> #sparse_matrix{default=Default, symmetric=Sym}.
 
 from_triplet(Triplets) -> from_triplet(Triplets, 0).
 from_triplet(Triplets, Default) ->
   from_list([ {{R,C},V} || {R,C,V} <- Triplets ], Default).
+from_triplet(Triplets, Default, Symmetry) ->
+	from_list([ {{R,C},V} || {R,C,V} <- Triplets ], Default,Symmetry).	
 
 from_list(List) -> from_list(List, 0).
 from_list(List, Default) ->
   MaxR = max_rows(List, hd(List)),
   MaxC = max_cols(List, hd(List)),
-  from_list(List, Default, {MaxR,MaxC}).
+  from_list(List, Default, false, {MaxR,MaxC}).
 
-from_list(List, Default, {MaxR,MaxC}) when is_integer(MaxR), is_integer(MaxC) ->
-  #sparse_matrix{dims={MaxR,MaxC}, default=Default, values=List}.
+from_list(List, Default,Symmetry) ->
+  MaxR = max_rows(List, hd(List)),
+  MaxC = max_cols(List, hd(List)),
+  from_list(List, Default, Symmetry, {MaxR,MaxC}).
+
+
+from_list(List, Default, Symmetry, {MaxR,MaxC})
+	when is_integer(MaxR), is_integer(MaxC) ->	
+  #sparse_matrix{dims={MaxR,MaxC}, default=Default, values=List, 
+								 symmetric=Symmetry}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACCESSORS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Get the get of a cell in the matrix
 get({R,C}, Matrix) when is_record(Matrix,sparse_matrix) ->
   El = [Value || {{R1,C1},Value} <- Matrix#sparse_matrix.values, R1==R, C1==C],
-  get(El, Matrix#sparse_matrix.default);
+	
+	%look for symetric cell
+	El2 =
+    if 
+	  (El == []) andalso Matrix#sparse_matrix.symmetric ->
+		  [Value2 || {{R2,C2},Value2} <- Matrix#sparse_matrix.values, R2==C, C2==R];		
+		true -> El
+    end,
+
+  get(El2, Matrix#sparse_matrix.default);
 
 get([], Default) -> Default;
 get([H|_], _) -> H.
 
-
+    
 %% Put a value into the matrix using triplet form. This replaces any existing
 %% value
 %% TODO Add a dimensional check
