@@ -62,8 +62,15 @@ put({R,C, V}, Matrix) when is_record(Matrix,sparse_matrix) ->
   Matrix#sparse_matrix{values=Values}.
 
 delete({R,C}, Matrix) when is_record(Matrix,sparse_matrix) ->
+  
   Values = lists:keydelete({R,C}, 1, Matrix#sparse_matrix.values),
-  Matrix#sparse_matrix{values=Values}.
+	Values2 =
+		if Matrix#sparse_matrix.symmetric ->			
+		  lists:keydelete({C,R}, 1, Values);
+		true ->
+			Values
+		end,
+	Matrix#sparse_matrix{values=Values2}.
  
 coordinates(Matrix) when is_record(Matrix, sparse_matrix) ->
   [ {R,C} || {{R,C}, _} <- Matrix#sparse_matrix.values ].

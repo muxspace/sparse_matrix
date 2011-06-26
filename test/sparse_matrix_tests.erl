@@ -81,4 +81,16 @@ delete_test_() ->
   ?_assertMatch(5, sparse_matrix:get({2,5}, Mat1)),
   Mat2 = sparse_matrix:delete({2,5}, Mat1),
   ?_assertMatch(0, sparse_matrix:get({2,5}, Mat2)).
+
+delete_symmetry_test_() ->
+  Raw = [ {1,1, 5}, {1,2, 3}, {2,1, 4}, {2,6, 3} ],
+  Mat = sparse_matrix:from_triplet(Raw,0,true),
+  Mat1 = sparse_matrix:put({2,5, 5}, Mat),
+	Mat2 = sparse_matrix:put({5,2, 5}, Mat1),
+  ?_assertMatch(5, sparse_matrix:get({2,5}, Mat1)),
+	?_assertMatch(5, sparse_matrix:get({5,2}, Mat1)),
+  Mat3 = sparse_matrix:delete({2,5}, Mat2),
+	?_assertMatch(0, sparse_matrix:get({2,5}, Mat3)),
+	?_assertMatch(0, sparse_matrix:get({5,2}, Mat3)).
+
   
