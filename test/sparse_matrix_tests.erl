@@ -28,7 +28,7 @@ from_triplet_default_test_() ->
 from_triplet_symmetric_test_() ->
   Raw = [ {new_york,montreal,8}, {new_york,boston,4}, {new_york,buffalo,9},
     {buffalo,toronto,3}, {boston,montreal,7} ],
-	Mat = sparse_matrix:from_triplet(Raw, -1, true),
+	Mat = sparse_matrix:from_triplet(Raw, [{default,-1},{symmetric,true}]),
 	?_assertMatch({3,4}, sparse_matrix:dimensions(Mat)),
 	?_assertMatch(4, sparse_matrix:get({boston,new_york}, Mat)),
 	?_assertMatch(8, sparse_matrix:get({montreal,new_york},Mat)),
@@ -37,7 +37,7 @@ from_triplet_symmetric_test_() ->
 from_triplet_symmetric_false_test_() ->
   Raw = [ {new_york,montreal,8}, {new_york,boston,4}, {new_york,buffalo,9},
     {buffalo,toronto,3}, {boston,montreal,7} ],
-	Mat = sparse_matrix:from_triplet(Raw, -1, false),
+	Mat = sparse_matrix:from_triplet(Raw, [{default,-1},{symmetric,false}]),
   ?_assertMatch({3,4}, sparse_matrix:dimensions(Mat)),
   ?_assertMatch(4, sparse_matrix:get({new_york,boston}, Mat)),
 	?_assertMatch(-1, sparse_matrix:dimensions(Mat)),
@@ -84,11 +84,11 @@ delete_test_() ->
 
 delete_symmetry_test_() ->
   Raw = [ {1,1, 5}, {1,2, 3}, {2,1, 4}, {2,6, 3} ],
-  Mat = sparse_matrix:from_triplet(Raw,0,true),
+  Mat = sparse_matrix:from_triplet(Raw,[{default,0},{symmetric,true}]),
   Mat1 = sparse_matrix:put({2,5, 5}, Mat),
 	Mat2 = sparse_matrix:put({5,2, 5}, Mat1),
-  ?_assertMatch(5, sparse_matrix:get({2,5}, Mat1)),
-	?_assertMatch(5, sparse_matrix:get({5,2}, Mat1)),
+  ?_assertMatch(5, sparse_matrix:get({2,5}, Mat2)),
+	?_assertMatch(5, sparse_matrix:get({5,2}, Mat2)),
   Mat3 = sparse_matrix:delete({2,5}, Mat2),
 	?_assertMatch(0, sparse_matrix:get({2,5}, Mat3)),
 	?_assertMatch(0, sparse_matrix:get({5,2}, Mat3)).
