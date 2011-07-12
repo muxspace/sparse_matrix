@@ -32,22 +32,11 @@ from_list(List) -> from_list(List, [{default,0},{symmetric,false}]).
 %%                        {default,0}]) -> #sparse_matrix{}
 from_list(List,Options) when is_list(Options)->
 	
-	DimsTest = proplists:get_value(dims, Options),
-	Dims =
-	case DimsTest of
-		{R,C} when is_integer(R) and is_integer(C) -> DimsTest;
-		_ ->
-			MaxR = max_rows(List, hd(List)),
-			MaxC = max_cols(List, hd(List)),
-			{MaxR, MaxC}
-	end,
-	
-	Default = proplists:get_value(default, Options,0),
-	
-	SymmetricTest = proplists:get_value(symmetric, Options,false),
-	Symmetric = if is_boolean(SymmetricTest) -> SymmetricTest; 
-							true-> false end,
+	Dims = get_dimension(proplists:get_value(dims, Options),List),
+	Default = proplists:get_value(default, Options,0),	
+	Symmetric =get_symmetry(proplists:get_value(symmetric, Options,false)),
 	Strict =false,
+	
 	MatrixT = #sparse_matrix{ dims=Dims, default=Default, strict=Strict,
 														values=List, symmetric=Symmetric},							 	
 	Matrix = enforce_upper(MatrixT),
@@ -132,6 +121,21 @@ mult(A, B) when is_record(A,sparse_matrix), is_record(B,sparse_matrix) ->
   not_implemented.
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PRIVATE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+get_dimension(DimTest,List) ->
+  case DimTest of
+    {R,C} when is_integer(R) and is_integer(C) -> DimTest;
+    _ ->
+      MaxR = max_rows(List, hd(List)),
+      MaxC = max_cols(List, hd(List)),
+      {MaxR, MaxC}
+  end.
+
+get_symmetry(SymmetryTest) ->
+  if is_boolean(SymmetryTest) -> SymmetryTest;
+  true-> false
+	end.
+
+
 delete_value({R,C},Values) ->
   lists:keydelete({R,C}, 1, Values).
 delete_value({R,C},Values,upper) ->
